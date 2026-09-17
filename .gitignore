@@ -1,0 +1,18 @@
+# env
+.env
+.env.*
+!.env.example
+
+# go
+server/app
+server/app.exe
+server/tmp/
+
+# node
+node_modules/
+client/dist/
+
+# misc
+.DS_Store
+*.log
+.vercel

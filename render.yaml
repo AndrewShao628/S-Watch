@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: s-watch-api
+    runtime: go
+    rootDir: server
+    plan: free
+    buildCommand: go build -tags netgo -ldflags "-s -w" -o app .
+    startCommand: ./app
+    healthCheckPath: /health
+    envVars:
+      - key: GIN_MODE
+        value: release
+      - key: DATABASE_NAME
+        value: swatch
+      - key: MONGODB_URI
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: REFRESH_SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

@@ -1,0 +1,170 @@
+[
+  {
+    "imdb_id": "tt0111161", "title": "The Shawshank Redemption", "year": 1994, "youtube_id": "6hB3S9bIaco",
+    "overview": "A banker serving a life sentence for a crime he insists he didn't commit forms an unlikely friendship and quietly plans for a future beyond prison walls.",
+    "genre": [{ "genre_id": 6, "genre_name": "Drama" }],
+    "admin_review": "A patient, deeply humane story about hope and friendship. Flawless performances and an ending that earns every bit of its emotion.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt0468569", "title": "The Dark Knight", "year": 2008, "youtube_id": "EXeTwQWrcwY",
+    "overview": "Batman, Commissioner Gordon and a new district attorney take on organised crime in Gotham, until an anarchic criminal known as the Joker pushes the city to the brink.",
+    "genre": [{ "genre_id": 1, "genre_name": "Action" }, { "genre_id": 5, "genre_name": "Crime" }, { "genre_id": 6, "genre_name": "Drama" }],
+    "admin_review": "The gold standard for superhero cinema: tense, thematically rich, and anchored by an unforgettable villain performance.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt1375666", "title": "Inception", "year": 2010, "youtube_id": "YoHD9XEInc0",
+    "overview": "A thief who steals secrets from inside dreams is offered a chance at redemption: plant an idea in a target's mind instead of taking one.",
+    "genre": [{ "genre_id": 1, "genre_name": "Action" }, { "genre_id": 12, "genre_name": "Sci-Fi" }, { "genre_id": 13, "genre_name": "Thriller" }],
+    "admin_review": "An inventive heist puzzle with spectacular set pieces. Occasionally exposition-heavy, but thrilling and original throughout.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt0816692", "title": "Interstellar", "year": 2014, "youtube_id": "zSWdZVtXT7E",
+    "overview": "With Earth failing, a former pilot joins a mission through a wormhole to find humanity a new home, leaving his children behind.",
+    "genre": [{ "genre_id": 2, "genre_name": "Adventure" }, { "genre_id": 6, "genre_name": "Drama" }, { "genre_id": 12, "genre_name": "Sci-Fi" }],
+    "admin_review": "Ambitious and emotionally sweeping. The science gets hand-wavy near the end, but the scale and heart are remarkable.",
+    "ranking": { "ranking_value": 4, "ranking_name": "Good" }
+  },
+  {
+    "imdb_id": "tt0133093", "title": "The Matrix", "year": 1999, "youtube_id": "vKQi3bBA1y8",
+    "overview": "A hacker discovers that the world he knows is a simulation and joins a rebellion against the machines that built it.",
+    "genre": [{ "genre_id": 1, "genre_name": "Action" }, { "genre_id": 12, "genre_name": "Sci-Fi" }],
+    "admin_review": "Genre-defining action and big ideas delivered with style. Its influence on modern blockbusters is impossible to overstate.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt0110912", "title": "Pulp Fiction", "year": 1994, "youtube_id": "s7EdQ4FqbhY",
+    "overview": "Interlocking stories of two hitmen, a boxer, a gangster's wife and a pair of diner robbers collide in Los Angeles.",
+    "genre": [{ "genre_id": 5, "genre_name": "Crime" }, { "genre_id": 6, "genre_name": "Drama" }],
+    "admin_review": "Razor-sharp dialogue and a playful non-linear structure make this endlessly rewatchable, though its violence won't suit everyone.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt0109830", "title": "Forrest Gump", "year": 1994, "youtube_id": "bLvqoHBptjg",
+    "overview": "A kind-hearted man with a simple outlook drifts through decades of American history while never letting go of his childhood love.",
+    "genre": [{ "genre_id": 6, "genre_name": "Drama" }, { "genre_id": 11, "genre_name": "Romance" }],
+    "admin_review": "Warm and charming with a memorable lead performance, if sometimes a little too sentimental.",
+    "ranking": { "ranking_value": 4, "ranking_name": "Good" }
+  },
+  {
+    "imdb_id": "tt6751668", "title": "Parasite", "year": 2019, "youtube_id": "5xH0HfJHsaY",
+    "overview": "A struggling family schemes its way into the employ of a wealthy household, until a hidden secret upends everything.",
+    "genre": [{ "genre_id": 6, "genre_name": "Drama" }, { "genre_id": 13, "genre_name": "Thriller" }],
+    "admin_review": "A masterful blend of dark comedy, social satire and suspense. Every twist lands; a modern classic.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt4154796", "title": "Avengers: Endgame", "year": 2019, "youtube_id": "TcMBFSGVi1c",
+    "overview": "After a devastating loss, the remaining Avengers assemble one last time to undo the damage and restore balance to the universe.",
+    "genre": [{ "genre_id": 1, "genre_name": "Action" }, { "genre_id": 2, "genre_name": "Adventure" }, { "genre_id": 12, "genre_name": "Sci-Fi" }],
+    "admin_review": "A crowd-pleasing finale with huge payoffs for long-time fans, though it is bloated and leans heavily on prior films.",
+    "ranking": { "ranking_value": 4, "ranking_name": "Good" }
+  },
+  {
+    "imdb_id": "tt7286456", "title": "Joker", "year": 2019, "youtube_id": "zAGVQLHvwOY",
+    "overview": "A failed comedian on the margins of Gotham society spirals into violence and becomes an unlikely symbol of unrest.",
+    "genre": [{ "genre_id": 5, "genre_name": "Crime" }, { "genre_id": 6, "genre_name": "Drama" }, { "genre_id": 13, "genre_name": "Thriller" }],
+    "admin_review": "A committed central performance carries a bleak story that feels derivative of better films. Unsettling, but uneven.",
+    "ranking": { "ranking_value": 3, "ranking_name": "Okay" }
+  },
+  {
+    "imdb_id": "tt1160419", "title": "Dune", "year": 2021, "youtube_id": "8g18jFHCLXk",
+    "overview": "The heir of a noble house is thrust into a deadly war over a desert planet that holds the most valuable resource in the galaxy.",
+    "genre": [{ "genre_id": 2, "genre_name": "Adventure" }, { "genre_id": 6, "genre_name": "Drama" }, { "genre_id": 12, "genre_name": "Sci-Fi" }],
+    "admin_review": "Monumental world-building, stunning visuals and a thunderous score. It ends abruptly, but it's a triumph of big-screen spectacle.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt15398776", "title": "Oppenheimer", "year": 2023, "youtube_id": "uYPbbksJxIg",
+    "overview": "The story of the physicist who led the Manhattan Project, and the political fallout that followed the birth of the atomic bomb.",
+    "genre": [{ "genre_id": 15, "genre_name": "Biography" }, { "genre_id": 6, "genre_name": "Drama" }, { "genre_id": 16, "genre_name": "History" }],
+    "admin_review": "",
+    "ranking": { "ranking_value": 0, "ranking_name": "Not Ranked" }
+  },
+  {
+    "imdb_id": "tt2582802", "title": "Whiplash", "year": 2014, "youtube_id": "7d_jQycdQGo",
+    "overview": "An ambitious young jazz drummer is pushed to his limits by a ruthless conservatory instructor.",
+    "genre": [{ "genre_id": 6, "genre_name": "Drama" }, { "genre_id": 9, "genre_name": "Music" }],
+    "admin_review": "Electrifying from the first beat to the last. Two ferocious performances and editing as precise as a drum solo.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt3783958", "title": "La La Land", "year": 2016, "youtube_id": "0pdqf4P9MB8",
+    "overview": "An aspiring actress and a jazz pianist fall in love in Los Angeles while chasing dreams that may pull them apart.",
+    "genre": [{ "genre_id": 4, "genre_name": "Comedy" }, { "genre_id": 6, "genre_name": "Drama" }, { "genre_id": 9, "genre_name": "Music" }, { "genre_id": 11, "genre_name": "Romance" }],
+    "admin_review": "A gorgeous, bittersweet love letter to dreamers with a genuinely great final sequence.",
+    "ranking": { "ranking_value": 4, "ranking_name": "Good" }
+  },
+  {
+    "imdb_id": "tt5052448", "title": "Get Out", "year": 2017, "youtube_id": "DzfpyUB60YY",
+    "overview": "A young man's weekend visit to his girlfriend's family estate turns increasingly sinister.",
+    "genre": [{ "genre_id": 8, "genre_name": "Horror" }, { "genre_id": 10, "genre_name": "Mystery" }, { "genre_id": 13, "genre_name": "Thriller" }],
+    "admin_review": "Smart, funny and genuinely scary. A razor-sharp social thriller that rewards a second viewing.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt1392190", "title": "Mad Max: Fury Road", "year": 2015, "youtube_id": "hEJnMQG9ev8",
+    "overview": "In a post-apocalyptic wasteland, a drifter and a rebel commander flee a warlord across the desert in a war rig.",
+    "genre": [{ "genre_id": 1, "genre_name": "Action" }, { "genre_id": 2, "genre_name": "Adventure" }, { "genre_id": 12, "genre_name": "Sci-Fi" }],
+    "admin_review": "Two hours of relentless, beautifully choreographed chaos. Practical action filmmaking at its absolute peak.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt1285016", "title": "The Social Network", "year": 2010, "youtube_id": "lB95KLmpLR4",
+    "overview": "A Harvard student builds a social networking site that makes him a billionaire and costs him his closest friendships.",
+    "genre": [{ "genre_id": 15, "genre_name": "Biography" }, { "genre_id": 6, "genre_name": "Drama" }],
+    "admin_review": "Crackling script and sharp direction turn a story about code and lawsuits into a gripping modern tragedy.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt6710474", "title": "Everything Everywhere All at Once", "year": 2022, "youtube_id": "wxN1T1uxQ2g",
+    "overview": "An overwhelmed laundromat owner must connect with versions of herself across the multiverse to save the world and her family.",
+    "genre": [{ "genre_id": 1, "genre_name": "Action" }, { "genre_id": 2, "genre_name": "Adventure" }, { "genre_id": 4, "genre_name": "Comedy" }],
+    "admin_review": "",
+    "ranking": { "ranking_value": 0, "ranking_name": "Not Ranked" }
+  },
+  {
+    "imdb_id": "tt0245429", "title": "Spirited Away", "year": 2001, "youtube_id": "ByXuk9QqQkk",
+    "overview": "A young girl wanders into a world of spirits and must work in a bathhouse for the gods to free herself and her parents.",
+    "genre": [{ "genre_id": 3, "genre_name": "Animation" }, { "genre_id": 2, "genre_name": "Adventure" }, { "genre_id": 14, "genre_name": "Family" }, { "genre_id": 7, "genre_name": "Fantasy" }],
+    "admin_review": "Enchanting, strange and endlessly imaginative. Hand-drawn animation doesn't get better than this.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt1856101", "title": "Blade Runner 2049", "year": 2017, "youtube_id": "gCcx85zbxz4",
+    "overview": "A new blade runner uncovers a long-buried secret that could plunge what's left of society into chaos.",
+    "genre": [{ "genre_id": 1, "genre_name": "Action" }, { "genre_id": 6, "genre_name": "Drama" }, { "genre_id": 12, "genre_name": "Sci-Fi" }],
+    "admin_review": "Breathtaking cinematography and a haunting atmosphere. Slow and long, but a worthy, thoughtful sequel.",
+    "ranking": { "ranking_value": 4, "ranking_name": "Good" }
+  },
+  {
+    "imdb_id": "tt2543164", "title": "Arrival", "year": 2016, "youtube_id": "tFMo3UJ4B4g",
+    "overview": "A linguist is recruited to communicate with mysterious extraterrestrial visitors before global tensions boil over.",
+    "genre": [{ "genre_id": 6, "genre_name": "Drama" }, { "genre_id": 10, "genre_name": "Mystery" }, { "genre_id": 12, "genre_name": "Sci-Fi" }],
+    "admin_review": "Cerebral, moving science fiction with a twist that reframes the whole film. Quietly brilliant.",
+    "ranking": { "ranking_value": 5, "ranking_name": "Excellent" }
+  },
+  {
+    "imdb_id": "tt2380307", "title": "Coco", "year": 2017, "youtube_id": "Ga6RYejo6Hk",
+    "overview": "A boy who dreams of becoming a musician journeys into the Land of the Dead to uncover his family's history.",
+    "genre": [{ "genre_id": 3, "genre_name": "Animation" }, { "genre_id": 2, "genre_name": "Adventure" }, { "genre_id": 14, "genre_name": "Family" }],
+    "admin_review": "Vibrant, heartfelt and beautifully animated. Bring tissues for the finale.",
+    "ranking": { "ranking_value": 4, "ranking_name": "Good" }
+  },
+  {
+    "imdb_id": "tt4633694", "title": "Spider-Man: Into the Spider-Verse", "year": 2018, "youtube_id": "g4Hbz2jLxvQ",
+    "overview": "Teenager Miles Morales becomes Spider-Man and teams up with spider-heroes from other dimensions to save every reality.",
+    "genre": [{ "genre_id": 3, "genre_name": "Animation" }, { "genre_id": 1, "genre_name": "Action" }, { "genre_id": 2, "genre_name": "Adventure" }],
+    "admin_review": "",
+    "ranking": { "ranking_value": 0, "ranking_name": "Not Ranked" }
+  },
+  {
+    "imdb_id": "tt0172495", "title": "Gladiator", "year": 2000, "youtube_id": "owK1qxDselE",
+    "overview": "A betrayed Roman general is sold into slavery and fights his way through the arena to take revenge on a corrupt emperor.",
+    "genre": [{ "genre_id": 1, "genre_name": "Action" }, { "genre_id": 2, "genre_name": "Adventure" }, { "genre_id": 6, "genre_name": "Drama" }],
+    "admin_review": "Rousing old-school epic filmmaking with a commanding lead. Some historical liberties, but hugely entertaining.",
+    "ranking": { "ranking_value": 4, "ranking_name": "Good" }
+  }
+]
