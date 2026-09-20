@@ -23,8 +23,9 @@ type Config struct {
 	RefreshTTL     time.Duration
 	AllowedOrigins []string
 
-	OpenAIKey   string
-	OpenAIModel string
+	// ModelDir optionally loads retrained artifacts from disk instead of the
+	// copies embedded in the binary.
+	ModelDir string
 
 	RecommendationLimit int
 
@@ -46,8 +47,7 @@ func Load() (*Config, error) {
 		AccessTTL:           getDuration("ACCESS_TOKEN_TTL", 15*time.Minute),
 		RefreshTTL:          getDuration("REFRESH_TOKEN_TTL", 7*24*time.Hour),
 		AllowedOrigins:      splitList(getEnv("ALLOWED_ORIGINS", "http://localhost:5173")),
-		OpenAIKey:           os.Getenv("OPENAI_API_KEY"),
-		OpenAIModel:         getEnv("OPENAI_MODEL", "gpt-4o-mini"),
+		ModelDir:            os.Getenv("MODEL_DIR"),
 		RecommendationLimit: getInt("RECOMMENDATION_LIMIT", 8),
 		AdminEmail:          strings.ToLower(strings.TrimSpace(os.Getenv("ADMIN_EMAIL"))),
 		AdminPassword:       os.Getenv("ADMIN_PASSWORD"),

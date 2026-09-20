@@ -20,10 +20,6 @@ services:
         generateValue: true
       - key: ALLOWED_ORIGINS
         sync: false
-      - key: OPENAI_API_KEY
-        sync: false
-      - key: OPENAI_MODEL
-        value: gpt-4o-mini
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD

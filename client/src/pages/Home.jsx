@@ -72,7 +72,7 @@ export default function Home() {
             <div className="hero-actions">
               <Link to={`/watch/${featured.imdb_id}`} className="btn btn-primary">▶ Play</Link>
               <Link to={isAuthenticated ? '/recommended' : '/register'} className="btn btn-ghost">
-                {isAuthenticated ? '✨ Get AI picks' : 'Join free for AI picks'}
+                {isAuthenticated ? '✨ See your picks' : 'Join free for personalised picks'}
               </Link>
             </div>
           </div>

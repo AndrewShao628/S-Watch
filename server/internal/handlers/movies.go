@@ -148,8 +148,8 @@ func (h *Handler) CreateMovie(c *gin.Context) {
 		movie.PosterPath = "https://img.youtube.com/vi/" + movie.YouTubeID + "/hqdefault.jpg"
 	}
 	if movie.AdminReview != "" {
-		if r, err := h.classifyReview(c, movie.AdminReview); err == nil {
-			movie.Ranking = r
+		if prediction, err := h.models.Classifier.Classify(movie.AdminReview); err == nil {
+			movie.Ranking = prediction.Ranking
 		} else {
 			log.Printf("create movie %s: review left unranked: %v", movie.ImdbID, err)
 		}
@@ -172,11 +172,13 @@ func (h *Handler) CreateMovie(c *gin.Context) {
 
 type updateReviewRequest struct {
 	AdminReview string `json:"admin_review" binding:"required,min=10,max=2000"`
-	// RankingName is only used when AI is disabled, as a manual override.
+	// RankingName lets an admin override the classifier's prediction.
 	RankingName string `json:"ranking_name"`
 }
 
-// UpdateReview stores an admin review and uses the LLM to derive the movie's ranking.
+// UpdateReview stores an admin review and derives the movie's ranking with the
+// trained review classifier. An explicit ranking_name always wins, because the
+// classifier is right about 4 times in 10 on the exact level.
 func (h *Handler) UpdateReview(c *gin.Context) {
 	var req updateReviewRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -184,24 +186,31 @@ func (h *Handler) UpdateReview(c *gin.Context) {
 		return
 	}
 
-	ranking, err := h.classifyReview(c, req.AdminReview)
-	source := "ai"
-	if err != nil {
-		if h.ai.Enabled() {
-			log.Printf("classify review: %v", err)
-		}
-		ranking, err = h.manualRanking(c, req.RankingName)
-		if err != nil {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"error": "could not rank the review automatically; provide a valid ranking_name",
-			})
+	var (
+		ranking    models.Ranking
+		confidence float64
+		source     = "model"
+	)
+	if req.RankingName != "" {
+		var err error
+		if ranking, err = h.manualRanking(c, req.RankingName); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "unknown ranking_name"})
 			return
 		}
 		source = "manual"
+	} else {
+		prediction, err := h.models.Classifier.Classify(req.AdminReview)
+		if err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{
+				"error": "could not rank this review; provide a ranking_name",
+			})
+			return
+		}
+		ranking, confidence = prediction.Ranking, prediction.Confidence
 	}
 
 	var movie models.Movie
-	err = h.db.Collection(database.MoviesCollection).FindOneAndUpdate(c,
+	err := h.db.Collection(database.MoviesCollection).FindOneAndUpdate(c,
 		bson.M{"imdb_id": c.Param("imdb_id")},
 		bson.M{"$set": bson.M{
 			"admin_review": strings.TrimSpace(req.AdminReview),
@@ -218,7 +227,12 @@ func (h *Handler) UpdateReview(c *gin.Context) {
 		internalError(c, err)
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"movie": movie, "ranking_source": source})
+	c.JSON(http.StatusOK, gin.H{
+		"movie":          movie,
+		"ranking_source": source,
+		"confidence":     confidence,
+		"model":          h.models.Classifier.Version,
+	})
 }
 
 func (h *Handler) DeleteMovie(c *gin.Context) {
@@ -258,17 +272,23 @@ func (h *Handler) rankings(ctx context.Context) ([]models.Ranking, error) {
 	return rankings, nil
 }
 
-func (h *Handler) classifyReview(ctx context.Context, review string) (models.Ranking, error) {
-	if !h.ai.Enabled() {
-		return models.Ranking{}, errors.New("ai disabled")
+// PreviewReview classifies a draft review without saving it, so the admin can
+// see what the model thinks before committing.
+func (h *Handler) PreviewReview(c *gin.Context) {
+	var req struct {
+		AdminReview string `json:"admin_review" binding:"required,min=10,max=2000"`
 	}
-	rankings, err := h.rankings(ctx)
+	if err := c.ShouldBindJSON(&req); err != nil {
+		badRequest(c, err)
+		return
+	}
+
+	prediction, err := h.models.Classifier.Classify(req.AdminReview)
 	if err != nil {
-		return models.Ranking{}, err
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "could not rank this review"})
+		return
 	}
-	ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
-	defer cancel()
-	return h.ai.ClassifyReview(ctx, review, rankings)
+	c.JSON(http.StatusOK, gin.H{"prediction": prediction, "model": h.models.Classifier.Version})
 }
 
 func (h *Handler) manualRanking(ctx context.Context, name string) (models.Ranking, error) {

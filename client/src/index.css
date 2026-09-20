@@ -717,3 +717,58 @@ blockquote {
   font-size: 0.8rem;
   text-align: center;
 }
+
+/* ---- model prediction ---- */
+.source-pill.model {
+  background: rgba(139, 124, 246, 0.18);
+  color: #c9c1ff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.prediction {
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+.prediction > p:first-child {
+  margin-top: 0;
+}
+.prob-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+}
+.prob-bars li {
+  display: grid;
+  grid-template-columns: 84px 1fr 42px;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+}
+.prob-label {
+  color: var(--muted);
+}
+.prob-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.prob-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.prob-value {
+  color: var(--muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.small {
+  font-size: 0.8rem;
+}

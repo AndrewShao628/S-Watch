@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"context"
-	"log"
 	"net/http"
 	"time"
 
@@ -10,18 +8,13 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
-	"swatch/internal/ai"
 	"swatch/internal/database"
 	"swatch/internal/middleware"
 	"swatch/internal/models"
 	"swatch/internal/recommend"
 )
 
-const (
-	maxWatchHistory = 50
-	// How many heuristic top candidates are handed to the LLM for re-ranking.
-	rerankPoolSize = 15
-)
+const maxWatchHistory = 50
 
 func (h *Handler) Me(c *gin.Context) {
 	user, err := h.currentUser(c)
@@ -61,6 +54,7 @@ func (h *Handler) UpdateFavouriteGenres(c *gin.Context) {
 }
 
 // RecordWatch appends to the user's capped watch history when playback starts.
+// This is the feedback the recommender learns from on the next training run.
 func (h *Handler) RecordWatch(c *gin.Context) {
 	imdbID := c.Param("imdb_id")
 	if _, err := h.findMovie(c, imdbID); err != nil {
@@ -87,8 +81,8 @@ func (h *Handler) RecordWatch(c *gin.Context) {
 	c.JSON(http.StatusOK, entry)
 }
 
-// Recommendations scores the catalogue with the weighted ranking algorithm and,
-// when OpenAI is configured, lets the LLM re-rank and explain the top candidates.
+// Recommendations folds the viewer into the trained latent space and blends the
+// model's affinity scores with editorial and freshness signals.
 func (h *Handler) Recommendations(c *gin.Context) {
 	user, err := h.currentUser(c)
 	if err != nil {
@@ -108,60 +102,13 @@ func (h *Handler) Recommendations(c *gin.Context) {
 	}
 
 	limit := clampInt(c.Query("limit"), h.cfg.RecommendationLimit, 1, 24)
-	ranked := recommend.Rank(user, movies, recommend.DefaultWeights, time.Now().UTC())
-	pool := ranked[:min(len(ranked), max(rerankPoolSize, limit))]
+	ranked := recommend.Rank(user, movies, h.models.Recommender, recommend.DefaultWeights, time.Now().UTC())
 
-	if h.ai.Enabled() && len(pool) > 0 {
-		recs, err := h.aiRerank(c, user, movies, pool, limit)
-		if err == nil {
-			c.JSON(http.StatusOK, gin.H{"recommendations": recs, "source": "ai"})
-			return
-		}
-		log.Printf("ai rerank failed, falling back to heuristic: %v", err)
-	}
-
-	c.JSON(http.StatusOK, gin.H{"recommendations": pool[:min(len(pool), limit)], "source": "heuristic"})
-}
-
-func (h *Handler) aiRerank(ctx context.Context, user *models.User, movies []models.Movie, pool []models.Recommendation, limit int) ([]models.Recommendation, error) {
-	titles := make(map[string]string, len(movies))
-	for _, m := range movies {
-		titles[m.ImdbID] = m.Title
-	}
-
-	profile := ai.Profile{FirstName: user.FirstName}
-	for _, g := range user.FavouriteGenres {
-		profile.FavouriteGenres = append(profile.FavouriteGenres, g.GenreName)
-	}
-	seen := map[string]bool{}
-	for i := len(user.WatchHistory) - 1; i >= 0 && len(profile.RecentlyWatched) < 10; i-- {
-		id := user.WatchHistory[i].ImdbID
-		if t, ok := titles[id]; ok && !seen[id] {
-			seen[id] = true
-			profile.RecentlyWatched = append(profile.RecentlyWatched, t)
-		}
-	}
-
-	ctx, cancel := context.WithTimeout(ctx, 25*time.Second)
-	defer cancel()
-	picks, err := h.ai.Rerank(ctx, profile, pool, min(limit, len(pool)))
-	if err != nil {
-		return nil, err
-	}
-
-	byID := make(map[string]models.Recommendation, len(pool))
-	for _, r := range pool {
-		byID[r.Movie.ImdbID] = r
-	}
-	recs := make([]models.Recommendation, 0, len(picks))
-	for _, p := range picks {
-		r := byID[p.ImdbID]
-		if p.Reason != "" {
-			r.Reason = p.Reason
-		}
-		recs = append(recs, r)
-	}
-	return recs, nil
+	c.JSON(http.StatusOK, gin.H{
+		"recommendations": ranked[:min(len(ranked), limit)],
+		"model":           h.models.Recommender.Version,
+		"trained_at":      h.models.Recommender.TrainedAt,
+	})
 }
 
 func (h *Handler) currentUser(c *gin.Context) (*models.User, error) {

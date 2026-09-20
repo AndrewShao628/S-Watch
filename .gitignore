@@ -8,6 +8,12 @@ server/app
 server/app.exe
 server/tmp/
 
+# python / training
+ml/.venv/
+ml/data/cache/
+__pycache__/
+*.pyc
+
 # node
 node_modules/
 client/dist/

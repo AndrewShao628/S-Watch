@@ -1,65 +1,109 @@
 package recommend
 
 import (
+	"strings"
 	"testing"
 	"time"
 
+	"swatch/internal/model"
 	"swatch/internal/models"
 )
 
 var (
-	drama  = models.Genre{GenreID: 6, GenreName: "Drama"}
-	scifi  = models.Genre{GenreID: 12, GenreName: "Sci-Fi"}
-	horror = models.Genre{GenreID: 8, GenreName: "Horror"}
+	scifi     = models.Genre{GenreID: 12, GenreName: "Sci-Fi"}
+	horror    = models.Genre{GenreID: 8, GenreName: "Horror"}
+	drama     = models.Genre{GenreID: 6, GenreName: "Drama"}
+	excellent = models.Ranking{RankingValue: 5, RankingName: "Excellent"}
+	bad       = models.Ranking{RankingValue: 2, RankingName: "Bad"}
 )
 
-func movie(id string, rank int, genres ...models.Genre) models.Movie {
-	return models.Movie{ImdbID: id, Title: id, Genre: genres, Ranking: models.Ranking{RankingValue: rank, RankingName: "x"}}
+func recommender(t *testing.T) *model.Recommender {
+	t.Helper()
+	engine, err := model.Load("")
+	if err != nil {
+		t.Fatalf("load model: %v", err)
+	}
+	return engine.Recommender
 }
 
-func TestRankPrefersFavouriteGenresAndCriticScore(t *testing.T) {
-	user := &models.User{FavouriteGenres: []models.Genre{scifi}}
-	movies := []models.Movie{
-		movie("horror-excellent", 5, horror),
-		movie("scifi-good", 4, scifi),
-		movie("scifi-bad", 2, scifi),
-	}
-
-	got := Rank(user, movies, DefaultWeights, time.Now())
-
-	if got[0].Movie.ImdbID != "scifi-good" {
-		t.Fatalf("expected scifi-good first, got %s", got[0].Movie.ImdbID)
-	}
-	if got[len(got)-1].Movie.ImdbID != "horror-excellent" && got[len(got)-1].Movie.ImdbID != "scifi-bad" {
-		t.Fatalf("unexpected last result %s", got[len(got)-1].Movie.ImdbID)
+// Catalogue titles that exist in the trained artifact.
+func catalogue() []models.Movie {
+	return []models.Movie{
+		{ImdbID: "tt0133093", Title: "The Matrix", Year: 1999, Genre: []models.Genre{scifi}, Ranking: excellent},
+		{ImdbID: "tt1856101", Title: "Blade Runner 2049", Year: 2017, Genre: []models.Genre{scifi}, Ranking: excellent},
+		{ImdbID: "tt5052448", Title: "Get Out", Year: 2017, Genre: []models.Genre{horror}, Ranking: excellent},
+		{ImdbID: "tt0111161", Title: "The Shawshank Redemption", Year: 1994, Genre: []models.Genre{drama}, Ranking: excellent},
 	}
 }
 
-func TestRankPenalisesRecentlyWatchedAndLearnsFromHistory(t *testing.T) {
+func find(recs []models.Recommendation, imdbID string) (models.Recommendation, bool) {
+	for _, r := range recs {
+		if r.Movie.ImdbID == imdbID {
+			return r, true
+		}
+	}
+	return models.Recommendation{}, false
+}
+
+func TestRankPenalisesRecentlyWatched(t *testing.T) {
 	now := time.Now()
+	rec := recommender(t)
 	user := &models.User{
-		WatchHistory: []models.WatchEntry{{ImdbID: "drama-watched", WatchedAt: now.Add(-time.Hour)}},
-	}
-	movies := []models.Movie{
-		movie("drama-watched", 5, drama),
-		movie("drama-new", 4, drama),
-		movie("scifi-new", 4, scifi),
+		FavouriteGenres: []models.Genre{scifi},
+		WatchHistory:    []models.WatchEntry{{ImdbID: "tt0133093", WatchedAt: now.Add(-time.Hour)}},
 	}
 
-	got := Rank(user, movies, DefaultWeights, now)
+	ranked := Rank(user, catalogue(), rec, DefaultWeights, now)
 
-	if got[0].Movie.ImdbID != "drama-new" {
-		t.Fatalf("expected history affinity to surface drama-new first, got %s", got[0].Movie.ImdbID)
+	watched, ok := find(ranked, "tt0133093")
+	if !ok {
+		t.Fatal("watched movie missing from results")
 	}
-	if got[len(got)-1].Movie.ImdbID != "drama-watched" {
-		t.Fatalf("expected recently watched title last, got %s", got[len(got)-1].Movie.ImdbID)
+	if ranked[0].Movie.ImdbID == "tt0133093" {
+		t.Error("a title watched an hour ago should not be the top pick")
+	}
+	if !strings.Contains(watched.Reason, "watched this recently") {
+		t.Errorf("reason should mention the recent view, got %q", watched.Reason)
 	}
 }
 
-func TestUnrankedMoviesGetNeutralCriticScore(t *testing.T) {
-	user := &models.User{}
-	got := Rank(user, []models.Movie{movie("unranked", 0, drama), movie("terrible", 1, drama)}, DefaultWeights, time.Now())
-	if got[0].Movie.ImdbID != "unranked" {
-		t.Fatalf("expected unranked above terrible, got %s", got[0].Movie.ImdbID)
+func TestRankExplainsPicksFromWatchHistory(t *testing.T) {
+	now := time.Now()
+	user := &models.User{WatchHistory: []models.WatchEntry{{ImdbID: "tt0133093", WatchedAt: now.Add(-48 * time.Hour)}}}
+
+	ranked := Rank(user, catalogue(), recommender(t), DefaultWeights, now)
+
+	var explained int
+	for _, r := range ranked {
+		if strings.Contains(strings.ToLower(r.Reason), "viewers who watched the matrix") {
+			explained++
+		}
+		if !strings.HasSuffix(r.Reason, ".") {
+			t.Errorf("reason is not a sentence: %q", r.Reason)
+		}
+	}
+	if explained == 0 {
+		t.Error("expected at least one pick to cite the watched title")
+	}
+}
+
+func TestRankFavoursCriticScoreWhenNothingIsKnown(t *testing.T) {
+	movies := catalogue()
+	movies[2].Ranking = bad // Get Out
+
+	ranked := Rank(&models.User{}, movies, recommender(t), DefaultWeights, time.Now())
+
+	poorlyRated, _ := find(ranked, "tt5052448")
+	if ranked[0].Movie.ImdbID == "tt5052448" {
+		t.Error("a badly reviewed title should not lead for a viewer with no profile")
+	}
+	if poorlyRated.Score >= ranked[0].Score {
+		t.Errorf("bad review scored %.2f, top pick scored %.2f", poorlyRated.Score, ranked[0].Score)
+	}
+}
+
+func TestRankHandlesEmptyCatalogue(t *testing.T) {
+	if got := Rank(&models.User{}, nil, recommender(t), DefaultWeights, time.Now()); len(got) != 0 {
+		t.Errorf("expected no recommendations, got %d", len(got))
 	}
 }

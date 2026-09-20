@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { errorMessage, adminApi, movieApi } from '../api/client'
+import { adminApi, errorMessage, movieApi } from '../api/client'
 import RankingBadge from '../components/RankingBadge.jsx'
 import Spinner from '../components/Spinner.jsx'
 
@@ -10,9 +10,9 @@ export default function AdminReview() {
   const [movie, setMovie] = useState(null)
   const [rankings, setRankings] = useState([])
   const [review, setReview] = useState('')
-  const [manualRanking, setManualRanking] = useState('')
-  const [needsManual, setNeedsManual] = useState(false)
-  const [status, setStatus] = useState({ saving: false, error: '', message: '' })
+  const [override, setOverride] = useState('')
+  const [prediction, setPrediction] = useState(null)
+  const [status, setStatus] = useState({ saving: false, previewing: false, error: '', message: '' })
 
   useEffect(() => {
     movieApi
@@ -25,24 +25,40 @@ export default function AdminReview() {
     movieApi.rankings().then(setRankings).catch(() => {})
   }, [imdbId])
 
+  const preview = async () => {
+    setStatus((s) => ({ ...s, previewing: true, error: '', message: '' }))
+    try {
+      const { prediction: p } = await adminApi.previewReview(review)
+      setPrediction(p)
+      setStatus((s) => ({ ...s, previewing: false }))
+    } catch (err) {
+      setPrediction(null)
+      setStatus((s) => ({ ...s, previewing: false, error: errorMessage(err) }))
+    }
+  }
+
   const onSubmit = async (e) => {
     e.preventDefault()
-    setStatus({ saving: true, error: '', message: '' })
+    setStatus((s) => ({ ...s, saving: true, error: '', message: '' }))
     try {
-      const { movie: updated, ranking_source } = await adminApi.updateReview(imdbId, review, manualRanking || undefined)
+      const { movie: updated, ranking_source, confidence } = await adminApi.updateReview(
+        imdbId,
+        review,
+        override || undefined,
+      )
       setMovie(updated)
-      setNeedsManual(false)
+      setPrediction(null)
       setStatus({
         saving: false,
+        previewing: false,
         error: '',
         message:
-          ranking_source === 'ai'
-            ? `AI ranked this review as "${updated.ranking.ranking_name}".`
-            : `Saved with manual ranking "${updated.ranking.ranking_name}".`,
+          ranking_source === 'model'
+            ? `The model ranked this review "${updated.ranking.ranking_name}" (${Math.round(confidence * 100)}% confident).`
+            : `Saved with your ranking "${updated.ranking.ranking_name}".`,
       })
     } catch (err) {
-      if (err.response?.status === 422) setNeedsManual(true)
-      setStatus({ saving: false, error: errorMessage(err), message: '' })
+      setStatus({ saving: false, previewing: false, error: errorMessage(err), message: '' })
     }
   }
 
@@ -52,11 +68,17 @@ export default function AdminReview() {
       await adminApi.deleteMovie(imdbId)
       navigate('/', { replace: true })
     } catch (err) {
-      setStatus({ saving: false, error: errorMessage(err), message: '' })
+      setStatus({ saving: false, previewing: false, error: errorMessage(err), message: '' })
     }
   }
 
   if (!movie) return status.error ? <p className="alert">{status.error}</p> : <Spinner />
+
+  const sortedProbabilities = prediction
+    ? [...rankings]
+        .map((r) => ({ ...r, probability: prediction.probabilities?.[r.ranking_name] ?? 0 }))
+        .sort((a, b) => b.ranking_value - a.ranking_value)
+    : []
 
   return (
     <div className="admin-page">
@@ -82,30 +104,58 @@ export default function AdminReview() {
             required
             value={review}
             onChange={(e) => setReview(e.target.value)}
-            placeholder="Write your take. The AI will read the sentiment and assign a ranking."
+            placeholder="Write your take. Our review classifier reads the sentiment and suggests a ranking."
           />
         </label>
 
-        {needsManual && (
-          <label className="field">
-            <span>AI is unavailable. Choose a ranking manually.</span>
-            <select className="input" required value={manualRanking} onChange={(e) => setManualRanking(e.target.value)}>
-              <option value="">Select ranking…</option>
-              {rankings.map((r) => (
-                <option key={r.ranking_name} value={r.ranking_name}>
-                  {r.ranking_name}
-                </option>
+        <div className="form-actions">
+          <button type="button" className="btn btn-ghost btn-sm" onClick={preview} disabled={review.length < 10 || status.previewing}>
+            {status.previewing ? 'Classifying…' : '⚙ Preview ranking'}
+          </button>
+        </div>
+
+        {prediction && (
+          <div className="prediction">
+            <p>
+              The model predicts <strong>{prediction.ranking.ranking_name}</strong> ·{' '}
+              {Math.round(prediction.confidence * 100)}% confident
+            </p>
+            <ul className="prob-bars">
+              {sortedProbabilities.map((r) => (
+                <li key={r.ranking_name}>
+                  <span className="prob-label">{r.ranking_name}</span>
+                  <span className="prob-track">
+                    <span className="prob-fill" style={{ width: `${Math.round(r.probability * 100)}%` }} />
+                  </span>
+                  <span className="prob-value">{Math.round(r.probability * 100)}%</span>
+                </li>
               ))}
-            </select>
-          </label>
+            </ul>
+            <p className="muted small">
+              The classifier picks the exact level about 4 times in 10, and lands within one level about 8 times in 10.
+              Override it below if it reads your review wrong.
+            </p>
+          </div>
         )}
+
+        <label className="field">
+          <span>Ranking</span>
+          <select className="input" value={override} onChange={(e) => setOverride(e.target.value)}>
+            <option value="">Let the model decide</option>
+            {rankings.map((r) => (
+              <option key={r.ranking_name} value={r.ranking_name}>
+                Override: {r.ranking_name}
+              </option>
+            ))}
+          </select>
+        </label>
 
         {status.error && <p className="alert">{status.error}</p>}
         {status.message && <p className="success">{status.message}</p>}
 
         <div className="form-actions">
           <button className="btn btn-primary" disabled={status.saving}>
-            {status.saving ? 'Ranking with AI…' : 'Save & rank review'}
+            {status.saving ? 'Saving…' : 'Save & rank review'}
           </button>
           <button type="button" className="btn btn-danger" onClick={onDelete}>
             Delete movie

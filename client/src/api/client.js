@@ -102,6 +102,7 @@ export const movieApi = {
   rankings: () => api.get('/rankings').then((r) => r.data),
   recordWatch: (imdbId) => api.post(`/movies/${encodeURIComponent(imdbId)}/watch`),
   recommendations: (limit) => api.get('/recommendations', { params: { limit } }).then((r) => r.data),
+  modelInfo: () => api.get('/model').then((r) => r.data),
 }
 
 export const userApi = {
@@ -113,5 +114,6 @@ export const adminApi = {
   createMovie: (movie) => api.post('/admin/movies', movie).then((r) => r.data),
   updateReview: (imdbId, admin_review, ranking_name) =>
     api.patch(`/admin/movies/${encodeURIComponent(imdbId)}/review`, { admin_review, ranking_name }).then((r) => r.data),
+  previewReview: (admin_review) => api.post('/admin/reviews/preview', { admin_review }).then((r) => r.data),
   deleteMovie: (imdbId) => api.delete(`/admin/movies/${encodeURIComponent(imdbId)}`),
 }

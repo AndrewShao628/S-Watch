@@ -13,11 +13,11 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
-	"swatch/internal/ai"
 	"swatch/internal/auth"
 	"swatch/internal/config"
 	"swatch/internal/database"
 	"swatch/internal/handlers"
+	"swatch/internal/model"
 	"swatch/internal/seed"
 )
 
@@ -41,15 +41,13 @@ func main() {
 	}
 	cancel()
 
-	aiSvc, err := ai.New(cfg.OpenAIKey, cfg.OpenAIModel)
+	engine, err := model.Load(cfg.ModelDir)
 	if err != nil {
-		log.Fatalf("ai: %v", err)
+		log.Fatalf("model: %v", err)
 	}
-	if aiSvc.Enabled() {
-		log.Printf("AI features enabled (model %s)", cfg.OpenAIModel)
-	} else {
-		log.Println("AI features disabled: set OPENAI_API_KEY to enable LLM ranking and recommendations")
-	}
+	info := engine.Info()
+	log.Printf("recommender: %s (trained %s)", info.Recommender.Version, info.Recommender.TrainedAt)
+	log.Printf("review classifier: %s (trained %s)", info.Classifier.Version, info.Classifier.TrainedAt)
 
 	tokens := auth.NewTokenManager(cfg.AccessSecret, cfg.RefreshSecret, cfg.AccessTTL, cfg.RefreshTTL)
 
@@ -66,7 +64,7 @@ func main() {
 		MaxAge:        12 * time.Hour,
 	}))
 
-	handlers.New(cfg, db, tokens, aiSvc).Register(router)
+	handlers.New(cfg, db, tokens, engine).Register(router)
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,
