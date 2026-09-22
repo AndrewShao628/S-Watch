@@ -1,4 +1,4 @@
-# S-Watch 🎬
+# S-Watch
 
 **Movie streaming platform with its own trained recommendation model**, built with Go (Gin-Gonic), React, MongoDB, and models trained in Python and served from Go.
 
